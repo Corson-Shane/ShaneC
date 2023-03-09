@@ -5,18 +5,32 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
-        ArrayList<String> words = readWords("res/words.txt"); //Step 4
-        HashMap<String, Integer> wordCounter = buildHashMap(words); //Step 5 
-        createHTMLFile(wordCounter); //Step 6
+        ArrayList<String> words = read("res/words.txt"); 
+        HashMap<String, Integer> wordCounter = buildHashMap(words); 
+        createHTMLFile(wordCounter, "res/word.html");
+        ArrayList<WordFrequency> wordFrequencyList = populateArrayList(wordCounter);
+        Collections.sort(wordFrequencyList);
+        createHTMLFile(wordFrequencyList, "res/sortedWords.html");
+
+        ArrayList<String> paragraphs = read("res/paragraph.txt"); 
+        HashMap<String, Integer> paragraphCounter = buildHashMap(paragraphs);  
+        createHTMLFile(paragraphCounter, "res/paragraph.html"); 
+        ArrayList<ParagraphFrequency> paragraphFrequencyList = populateParagraphArrayList(paragraphCounter);
+        Collections.sort(paragraphFrequencyList);
+        createParagraphHTMLFile(paragraphFrequencyList, "res/sortedParagraphWords.html");
     }
 
-    //Step 4 Read Input File
-    private static ArrayList<String> readWords(String fileName){
+    /**
+     * @param fileName
+     * reads input from file and loads words into ArrayList wordList
+     * @return
+     */
+    private static ArrayList<String> read(String fileName){
         File file = new File(fileName);
         ArrayList<String> wordList = new ArrayList<>();
 
@@ -52,39 +66,51 @@ public class App {
         return wordList;
     }
 
-    // Step 5 - Count Word Occurences
+
+    /**
+     * @param words
+     * creates HashMap counter from ArrayList
+     * @return
+     */
     private static HashMap<String, Integer> buildHashMap(ArrayList<String> words)
     {
-        HashMap<String, Integer> wordCounter = new HashMap<>();
+        HashMap<String, Integer> counter = new HashMap<>();
         for(String word: words)
         {
-            Integer count = wordCounter.get(word);
+            Integer count = counter.get(word);
             if(count == null)
             {
-                wordCounter.put(word, 1);
+                counter.put(word, 1);
             }
             else
             {
-                wordCounter.put(word, count + 1);
+                counter.put(word, count + 1);
             }
         }
-        return wordCounter;
+        return counter;
     }
 
-    // Step 6 - Create Output HTML File
-    private static void createHTMLFile(HashMap<String, Integer> wordCounter)
+
+
+    
+    /**
+     * @param counter
+     * creates HTML file containing table using values from HashMap, unsorted
+     * @param pathname
+     */
+    private static void createHTMLFile(HashMap<String, Integer> counter, String pathname)
     {
-        File file = new File("res/word.html");
+        File file = new File(pathname);
         try {
             FileWriter fileWriter = new FileWriter(file);
             StringBuilder builder = new StringBuilder();
             builder.append("<h1>Word Count</h1>");
             builder.append("<table>");
-            for(String key: wordCounter.keySet())
+            for(String key: counter.keySet())
             {
                 builder.append("<tr>");
-                builder.append("<td> + key + </td>");
-                builder.append("<td>" + wordCounter.get(key) + "</td>");
+                builder.append("<td>" + key + "</td>");
+                builder.append("<td>" + counter.get(key) + "</td>");
                 builder.append("</tr>");
             }
             builder.append("</table>");
@@ -95,9 +121,102 @@ public class App {
             e.printStackTrace();
         }
 
-        for(String keyWord: wordCounter.keySet())
+        for(String keyWord: counter.keySet())
         {
-            System.out.println(keyWord + ": " + wordCounter.get(keyWord));
+            System.out.println(keyWord + ": " + counter.get(keyWord));
+        }
+    }
+
+    /**
+     * @param wordCounter
+     * populates ArrayList of type WordFrequency using values from HashMap
+     * @return
+     */
+    private static ArrayList<WordFrequency> populateArrayList(HashMap<String, Integer> wordCounter)
+    {
+        ArrayList<WordFrequency> wordFrequencyList = new ArrayList<>();
+        for(String key: wordCounter.keySet())
+        {
+            WordFrequency wordFrequency = new WordFrequency(null, null);
+            wordFrequency.wordCount = wordCounter.get(key); 
+            wordFrequency.word = key;
+            wordFrequencyList.add(wordFrequency);
+        }
+        return wordFrequencyList;
+    }
+
+    /**
+     * @param wordCounter
+     * populates ArrayList of type ParagraphFrequency using values from HashMap
+     * @return
+     */
+    private static ArrayList<ParagraphFrequency> populateParagraphArrayList(HashMap<String, Integer> wordCounter)
+    {
+        ArrayList<ParagraphFrequency> paragraphFrequencyList = new ArrayList<>();
+        for(String key: wordCounter.keySet())
+        {
+            ParagraphFrequency paragraphFrequency = new ParagraphFrequency(null, null);
+            paragraphFrequency.wordCount = wordCounter.get(key); 
+            paragraphFrequency.word = key;
+            paragraphFrequencyList.add(paragraphFrequency);
+        }
+        return paragraphFrequencyList;
+    }
+
+    /**
+     * @param wordFrequencyList
+     * creates HTML file containing values from ArrayList of type WordFrequency
+     * @param pathname
+     */
+    private static void createHTMLFile(ArrayList<WordFrequency> wordFrequencyList, String pathname)
+    {
+        File file = new File(pathname);
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            StringBuilder builder = new StringBuilder();
+            builder.append("<h1>Word Count<h1>");
+            builder.append("<table>");
+            for(WordFrequency wordFrequency: wordFrequencyList)
+            {
+                builder.append("<tr>");
+                builder.append("<td>" + wordFrequency.word + "</td>");
+                builder.append("<td>" + wordFrequency.wordCount + "</td>");
+                builder.append("</tr>");
+            }
+            builder.append("</table>");
+            fileWriter.append(builder.toString());
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    /**
+     * @param paragraphFrequencyList
+     * creates HTML file containing values from ArrayList of type ParagraphFrequency
+     * @param pathname
+     */
+    private static void createParagraphHTMLFile(ArrayList<ParagraphFrequency> paragraphFrequencyList, String pathname)
+    {
+        File file = new File(pathname);
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            StringBuilder builder = new StringBuilder();
+            builder.append("<h1>Word Count<h1>");
+            builder.append("<table>");
+            for(ParagraphFrequency paragraphFrequency: paragraphFrequencyList)
+            {
+                builder.append("<tr>");
+                builder.append("<td>" + paragraphFrequency.word + "</td>");
+                builder.append("<td>" + paragraphFrequency.wordCount + "</td>");
+                builder.append("</tr>");
+            }
+            builder.append("</table>");
+            fileWriter.append(builder.toString());
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
