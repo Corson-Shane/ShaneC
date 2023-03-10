@@ -12,14 +12,14 @@ public class App {
     public static void main(String[] args) throws Exception {
         ArrayList<String> words = read("res/words.txt"); 
         HashMap<String, Integer> wordCounter = buildHashMap(words); 
-        createHTMLFile(wordCounter, "res/word.html");
+        createHTMLFile(wordCounter,"Words" ,"res/word.html");
         ArrayList<WordFrequency> wordFrequencyList = populateArrayList(wordCounter);
         Collections.sort(wordFrequencyList);
         createHTMLFile(wordFrequencyList, "res/sortedWords.html");
 
         ArrayList<String> paragraphs = read("res/paragraph.txt"); 
         HashMap<String, Integer> paragraphCounter = buildHashMap(paragraphs);  
-        createHTMLFile(paragraphCounter, "res/paragraph.html"); 
+        createHTMLFile(paragraphCounter, "Paragraph Words", "res/paragraph.html"); 
         ArrayList<ParagraphFrequency> paragraphFrequencyList = populateParagraphArrayList(paragraphCounter);
         Collections.sort(paragraphFrequencyList);
         createParagraphHTMLFile(paragraphFrequencyList, "res/sortedParagraphWords.html");
@@ -98,13 +98,13 @@ public class App {
      * creates HTML file containing table using values from HashMap, unsorted
      * @param pathname
      */
-    private static void createHTMLFile(HashMap<String, Integer> counter, String pathname)
+    private static void createHTMLFile(HashMap<String, Integer> counter, String header, String pathname)
     {
         File file = new File(pathname);
         try {
             FileWriter fileWriter = new FileWriter(file);
             StringBuilder builder = new StringBuilder();
-            builder.append("<h1>Word Count</h1>");
+            builder.append("<h1>" + header + ", unsorted</h1>");
             builder.append("<table>");
             for(String key: counter.keySet())
             {
@@ -174,7 +174,7 @@ public class App {
         try {
             FileWriter fileWriter = new FileWriter(file);
             StringBuilder builder = new StringBuilder();
-            builder.append("<h1>Word Count<h1>");
+            builder.append("<h1>Words, sorted<h1>");
             builder.append("<table>");
             for(WordFrequency wordFrequency: wordFrequencyList)
             {
@@ -203,7 +203,7 @@ public class App {
         try {
             FileWriter fileWriter = new FileWriter(file);
             StringBuilder builder = new StringBuilder();
-            builder.append("<h1>Word Count<h1>");
+            builder.append("<h1>Paragraph words, sorted<h1>");
             builder.append("<table>");
             for(ParagraphFrequency paragraphFrequency: paragraphFrequencyList)
             {
